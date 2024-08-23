@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+duckdb = "*"
+sqlalchemy = "*"
+
+[dev-packages]
+pyright = "*"
+black = "*"
+isort = "*"
+flake8 = "*"
+pyinstaller = "*"
+
+[requires]
+python_version = "3.12"
