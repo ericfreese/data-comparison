@@ -4,52 +4,55 @@ Takes two CSV files with overlapping column names and generates a comparison rep
 
 ## Example
 
-`before.csv`:
+([`xsv`](https://github.com/BurntSushi/xsv) used for illustration purposes)
 
-```csv
-name,color,amount
-foo,red,3
-foo,green,2
-foo,blue,4
-bar,red,5
-bar,green,3
+Assume you have two files `before.csv` and `after.csv`:
+
+```
+$ xsv table before.csv
+name  color  amount
+foo   red    3
+foo   green  2
+foo   blue   4
+bar   red    5
+bar   green  3
+
+$ xsv table after.csv
+name  color  amount
+foo   red    5
+foo   green  2
+bar   red    5
+bar   green  2
+bar   blue   4
 ```
 
-`after.csv`:
+You can compare them in the following ways:
 
-```csv
-name,color,amount
-foo,red,5
-foo,green,2
-bar,red,5
-bar,green,2
-bar,blue,4
 ```
+$ data-compare before.csv after.csv -m amount -g color | xsv table
+color  b_amount  a_amount  d_amount
+blue   4.000     4.000     0.000
+green  5.000     4.000     -1.000
+red    8.000     10.000    2.000
 
-```sh
-$ data-compare before.csv after.csv -m amount -g color
-color,b_amount,a_amount,d_amount
-blue,4.000,4.000,0.000
-green,5.000,4.000,-1.000
-red,8.000,10.000,2.000
-```
+$ data-compare before.csv after.csv -m amount -g name | xsv table
+name  b_amount  a_amount  d_amount
+bar   8.000     11.000    3.000
+foo   9.000     7.000     -2.000
 
-```sh
-$ data-compare before.csv after.csv -m amount -g name
-name,b_amount,a_amount,d_amount
-bar,8.000,11.000,3.000
-foo,9.000,7.000,-2.000
-```
+$ data-compare before.csv after.csv -m amount -g color name | xsv table
+color  name  b_amount  a_amount  d_amount
+blue   bar             4.000     4.000
+blue   foo   4.000               -4.000
+green  bar   3.000     2.000     -1.000
+green  foo   2.000     2.000     0.000
+red    bar   5.000     5.000     0.000
+red    foo   3.000     5.000     2.000
 
-```sh
-$ data-compare before.csv after.csv -m amount -g color name
-color,name,b_amount,a_amount,d_amount
-blue,bar,,4.000,4.000
-blue,foo,4.000,,-4.000
-green,bar,3.000,2.000,-1.000
-green,foo,2.000,2.000,0.000
-red,bar,5.000,5.000,0.000
-red,foo,3.000,5.000,2.000
+$ data-compare /tmp/before.csv /tmp/after.csv -m amount -g color=red name | xsv table
+color  name  b_amount  a_amount  d_amount
+red    bar   5.000     5.000     0.000
+red    foo   3.000     5.000     2.000
 ```
 
 ## Usage
